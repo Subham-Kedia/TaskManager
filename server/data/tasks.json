@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "title": "Complete project proposal",
+    "description": "Finalize the project proposal document with all requirements",
+    "completion_date": null,
+    "assignee": "John Doe",
+    "status": "In Progress",
+    "due_date": "2025-04-15T18:00:00.000Z",
+    "priority": "high",
+    "completed": false,
+    "createdAt": "2025-03-25T10:30:00.000Z"
+  },
+  {
+    "id": "2",
+    "title": "Review pull requests",
+    "description": "Review and merge pending pull requests from the team",
+    "completion_date": "2025-03-28T15:20:00.000Z",
+    "assignee": "Jane Smith",
+    "status": "Completed",
+    "due_date": "2025-03-29T17:00:00.000Z",
+    "priority": "medium",
+    "completed": true,
+    "createdAt": "2025-03-26T09:15:00.000Z"
+  },
+  {
+    "id": "3",
+    "title": "Set up testing environment",
+    "description": "Configure testing framework and write initial test cases",
+    "completion_date": null,
+    "assignee": "Alex Johnson",
+    "status": "To Do",
+    "due_date": "2025-04-10T14:00:00.000Z",
+    "priority": "high",
+    "completed": false,
+    "createdAt": "2025-03-27T14:20:00.000Z"
+  },
+  {
+    "id": "4",
+    "title": "Update documentation",
+    "description": "Update API documentation with recent changes",
+    "completion_date": null,
+    "assignee": "Sarah Williams",
+    "status": "In Progress",
+    "due_date": "2025-04-05T23:59:59.000Z",
+    "priority": "low",
+    "completed": false,
+    "createdAt": "2025-03-28T11:45:00.000Z"
+  },
+  {
+    "id": "5",
+    "title": "Weekly team meeting",
+    "description": "Prepare agenda for the weekly team sync",
+    "completion_date": "2025-03-29T17:30:00.000Z",
+    "assignee": "Mike Brown",
+    "status": "Completed",
+    "due_date": "2025-03-29T16:00:00.000Z",
+    "priority": "medium",
+    "completed": true,
+    "createdAt": "2025-03-29T16:00:00.000Z"
+  }
+]
