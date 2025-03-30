@@ -31,7 +31,7 @@ export const fetchTasks = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_SERVER_BASE_URL}/tasks`
+        `${import.meta.env.VITE_SERVER_BASE_URL}tasks`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch tasks");
