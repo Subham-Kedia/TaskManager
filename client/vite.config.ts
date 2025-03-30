@@ -31,6 +31,8 @@ export default defineConfig({
       "@utils": "/src/utils",
       "@assets": "/src/assets",
       "@services": "/src/services",
+      "@types": "/src/types",
+      "@context": "/src/context",
     },
   },
 });

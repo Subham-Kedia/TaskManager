@@ -29,7 +29,9 @@
       "@utils/*": ["src/utils/*"],
       "@assets/*": ["src/assets/*"],
       "@config/*": ["src/config/*"],
-      "@pages/*": ["src/pages/*"]
+      "@pages/*": ["src/pages/*"],
+      "@types/*": ["src/types/*"],
+      "@context/*": ["src/context/*"],
     } 
   },
   "include": ["src"]

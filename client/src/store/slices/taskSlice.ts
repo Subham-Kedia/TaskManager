@@ -1,17 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  completion_date: string | null;
-  assignee: string;
-  status: "To Do" | "In Progress" | "Completed";
-  due_date: string;
-  priority: "low" | "medium" | "high";
-  completed: boolean;
-  createdAt: string;
-}
+import { getTasks } from "@/services/task";
+import { Task } from "@/types/task";
 
 interface TaskState {
   tasks: Task[];
@@ -30,13 +19,8 @@ export const fetchTasks = createAsyncThunk(
   "tasks/fetchTasks",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SERVER_BASE_URL}tasks`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch tasks");
-      }
-      return await response.json();
+      const response = await getTasks();
+      return response;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
