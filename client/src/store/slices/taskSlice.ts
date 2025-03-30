@@ -4,12 +4,16 @@ import { Task } from "@/types/task";
 
 interface TaskState {
   tasks: Task[];
+  filteredTasks: Task[];
+  searchQuery: string;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: TaskState = {
   tasks: [],
+  filteredTasks: [],
+  searchQuery: "",
   loading: false,
   error: null,
 };
@@ -70,6 +74,23 @@ const taskSlice = createSlice({
           status === "Completed" ? new Date().toISOString() : null;
       }
     },
+    searchTasks: (state, action: PayloadAction<string>) => {
+      state.searchQuery = action.payload;
+
+      if (!action.payload.trim()) {
+        state.filteredTasks = state.tasks;
+      } else {
+        const query = action.payload.toLowerCase();
+        state.filteredTasks = state.tasks.filter(
+          (task) =>
+            task.title.toLowerCase().includes(query) ||
+            task.description.toLowerCase().includes(query) ||
+            task.assignee.toLowerCase().includes(query) ||
+            task.status.toLowerCase().includes(query) ||
+            task.priority.toLowerCase().includes(query)
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -80,6 +101,7 @@ const taskSlice = createSlice({
       .addCase(fetchTasks.fulfilled, (state, action) => {
         state.loading = false;
         state.tasks = action.payload;
+        state.filteredTasks = action.payload; // Initialize filtered tasks
       })
       .addCase(fetchTasks.rejected, (state, action) => {
         state.loading = false;
@@ -94,6 +116,7 @@ export const {
   deleteTask,
   toggleTaskCompletion,
   updateTaskStatus,
+  searchTasks,
 } = taskSlice.actions;
 
 export default taskSlice.reducer;

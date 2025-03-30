@@ -3,10 +3,11 @@ import {
   ThemeProvider as MUIThemeProvider,
   createTheme,
   responsiveFontSizes,
+  PaletteMode,
 } from "@mui/material/styles";
-import { PaletteMode } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 
-// Define the shape of the context
+// Define context type
 type ThemeContextType = {
   mode: PaletteMode;
   toggleColorMode: () => void;
@@ -18,18 +19,28 @@ const ThemeContext = createContext<ThemeContextType>({
   toggleColorMode: () => {},
 });
 
-// Hook to use the theme context
-export const useThemeContext = () => useContext(ThemeContext);
+// Hook to use theme context
+export const useTheme = () => useContext(ThemeContext);
 
 // Theme provider component
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [mode, setMode] = useState<PaletteMode>("light");
+  // Get saved theme from localStorage
+  const getSavedTheme = (): PaletteMode => {
+    const savedTheme = localStorage.getItem("themeMode");
+    return (savedTheme as PaletteMode) || "light";
+  };
 
-  // Function to toggle between light and dark modes
+  const [mode, setMode] = useState<PaletteMode>(getSavedTheme);
+
+  // Toggle between light and dark modes
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+    setMode((prevMode) => {
+      const newMode = prevMode === "light" ? "dark" : "light";
+      localStorage.setItem("themeMode", newMode);
+      return newMode;
+    });
   };
 
   // Generate the theme based on current mode
@@ -96,40 +107,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
         h5: { fontSize: "1.25rem", fontWeight: 500 },
         h6: { fontSize: "1rem", fontWeight: 500 },
       },
-      shape: {
-        borderRadius: 8,
-      },
       components: {
         MuiButton: {
           styleOverrides: {
             root: {
               textTransform: "none",
               borderRadius: 8,
-              padding: "8px 16px",
-            },
-            contained: {
-              boxShadow: "none",
-              "&:hover": {
-                boxShadow:
-                  "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14)",
-              },
             },
           },
         },
-        MuiCard: {
+        MuiPaper: {
           styleOverrides: {
             root: {
-              boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-              borderRadius: 12,
+              backgroundImage: "none",
             },
           },
         },
-        MuiTextField: {
+        MuiAppBar: {
           styleOverrides: {
             root: {
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 8,
-              },
+              boxShadow:
+                mode === "dark"
+                  ? "0 2px 8px rgba(0, 0, 0, 0.5)"
+                  : "0 2px 8px rgba(0, 0, 0, 0.1)",
             },
           },
         },
@@ -140,14 +140,19 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [mode]);
 
   // Context value
-  const contextValue = {
-    mode,
-    toggleColorMode,
-  };
+  const contextValue = useMemo(() => {
+    return {
+      mode,
+      toggleColorMode,
+    };
+  }, [mode]);
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <MUIThemeProvider theme={theme}>{children}</MUIThemeProvider>
+      <MUIThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </MUIThemeProvider>
     </ThemeContext.Provider>
   );
 };

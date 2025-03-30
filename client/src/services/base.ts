@@ -72,5 +72,5 @@ const getServiceInstance = (baseURL: string) => {
 };
 
 export const taskManagerService = getServiceInstance(
-  `${import.meta.env.VITE_SUPPLY_CHAIN_SERVICE}/`
+  `${import.meta.env.VITE_TASK_MANAGER_SERVICE_URL}/`
 );

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Container,
   Typography,
@@ -13,21 +13,47 @@ import {
   IconButton,
   CircularProgress,
   Alert,
+  Box,
+  InputBase,
+  alpha,
 } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Search as SearchIcon,
+  Close as CloseIcon,
+} from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTasks } from "@/store/slices/taskSlice";
+import { fetchTasks, searchTasks } from "@/store/slices/taskSlice";
 import { RootState, AppDispatch } from "@/store";
+import { useTheme } from "@/context/ThemeContext";
 
 function TaskTable() {
   const dispatch = useDispatch<AppDispatch>();
-  const { tasks, loading, error } = useSelector(
+  const { mode } = useTheme();
+  const { filteredTasks, loading, error, searchQuery } = useSelector(
     (state: RootState) => state.tasks
   );
+  const [localSearchQuery, setLocalSearchQuery] = useState("");
 
   useEffect(() => {
     dispatch(fetchTasks());
   }, [dispatch]);
+
+  useEffect(() => {
+    // Keep local search state in sync with Redux state
+    setLocalSearchQuery(searchQuery);
+  }, [searchQuery]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    dispatch(searchTasks(localSearchQuery));
+  };
+
+  const clearSearch = () => {
+    setLocalSearchQuery("");
+    dispatch(searchTasks(""));
+  };
 
   // Function to get appropriate color for priority
   const getPriorityColor = (priority: string) => {
@@ -59,14 +85,72 @@ function TaskTable() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Task List
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4">Task List</Typography>
+
+        <Paper
+          component="form"
+          onSubmit={handleSearch}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            borderRadius: 2,
+            backgroundColor: alpha(
+              mode === "light" ? "#f5f5f5" : "#2a2a2a",
+              0.7
+            ),
+            "&:hover": {
+              backgroundColor: alpha(
+                mode === "light" ? "#e0e0e0" : "#333333",
+                0.9
+              ),
+            },
+            pl: 2,
+            width: { xs: "100%", sm: "300px" },
+            maxWidth: "500px",
+          }}
+        >
+          <SearchIcon sx={{ color: "text.secondary", mr: 1 }} />
+          <InputBase
+            placeholder="Search tasks..."
+            sx={{
+              flex: 1,
+              "& .MuiInputBase-input": {
+                py: 1,
+              },
+            }}
+            value={localSearchQuery}
+            onChange={(e) => setLocalSearchQuery(e.target.value)}
+          />
+          {localSearchQuery && (
+            <IconButton size="small" onClick={clearSearch} sx={{ p: "5px" }}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Paper>
+      </Box>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
+      )}
+
+      {searchQuery && (
+        <Typography variant="body2" sx={{ mb: 2 }}>
+          {filteredTasks.length === 0
+            ? `No results found for "${searchQuery}"`
+            : `Found ${filteredTasks.length} result${
+                filteredTasks.length !== 1 ? "s" : ""
+              } for "${searchQuery}"`}
+        </Typography>
       )}
 
       <TableContainer component={Paper}>
@@ -89,8 +173,8 @@ function TaskTable() {
                   <CircularProgress size={30} />
                 </TableCell>
               </TableRow>
-            ) : tasks.length > 0 ? (
-              tasks.map((task) => (
+            ) : filteredTasks.length > 0 ? (
+              filteredTasks.map((task) => (
                 <TableRow key={task.id}>
                   <TableCell>{task.title}</TableCell>
                   <TableCell>
