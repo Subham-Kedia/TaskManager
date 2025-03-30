@@ -1,13 +1,7 @@
 import axios from "axios";
-// import {
-//   getSavedUserDCId,
-//   getUserData,
-//   //   removeUser,
-//   saveUserData,
-// } from "Utilities/localStorage";
-import { notifyUser } from "../utilities";
+import { notifyUser } from "@utils/index";
 
-const AUTH_TOKEN_KEY = "auth_token";
+const AUTH_TOKEN_KEY = "task_manager_auth_token";
 
 const getAuthToken = (): string | null => {
   return localStorage.getItem(AUTH_TOKEN_KEY);
