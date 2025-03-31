@@ -25,7 +25,6 @@ function Dashboard() {
     counts: [],
   });
 
-  // State for hours distribution pie chart
   const [hoursDistribution, setHoursDistribution] = useState<{
     labels: string[];
     data: number[];
@@ -37,21 +36,18 @@ function Dashboard() {
   });
 
   useEffect(() => {
+    if (tasks.length > 0) return;
     dispatch(fetchTasks());
   }, [dispatch]);
 
-  // Process tasks data for charts
   useEffect(() => {
     if (tasks.length === 0) return;
 
-    // Get today's date
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set to beginning of day
+    today.setHours(0, 0, 0, 0);
 
-    // Format a date as DD MMM (e.g., "15 Apr")
     const formatDate = (date: Date) => {
       const day = date.getDate();
-      // Array of month abbreviations
       const months = [
         "Jan",
         "Feb",
@@ -70,7 +66,6 @@ function Dashboard() {
       return `${day} ${month}`;
     };
 
-    // Generate an array of the next 10 days (including today) instead of 14
     const next10Days: Date[] = [];
     for (let i = 0; i < 10; i++) {
       const date = new Date(today);
@@ -78,22 +73,16 @@ function Dashboard() {
       next10Days.push(date);
     }
 
-    // Format dates for display
     const formattedNext10Days = next10Days.map(formatDate);
-
-    // ------- COMPLETION CHART PROCESSING -------
-    // Get completed tasks
     const completedTasks = tasks.filter((task) => task.status === "Completed");
 
-    // Group by completion date
     const tasksByDate = completedTasks.reduce(
       (acc: Record<string, number>, task) => {
         if (!task.completion_date) return acc;
 
         const date = new Date(task.completion_date);
-        date.setHours(0, 0, 0, 0); // Normalize time to beginning of day
+        date.setHours(0, 0, 0, 0);
 
-        // Only include if it's within our date range (today or future)
         if (date >= today) {
           const formattedDate = formatDate(date);
           acc[formattedDate] = (acc[formattedDate] || 0) + 1;
@@ -104,12 +93,10 @@ function Dashboard() {
       {}
     );
 
-    // Initialize counts for all dates in our range
     const completionCounts = formattedNext10Days.map((date) => {
       return tasksByDate[date] || 0;
     });
 
-    // Calculate cumulative counts
     let cumulativeCount = 0;
     const cumulativeCounts = completionCounts.map((count) => {
       cumulativeCount += count;
@@ -121,19 +108,15 @@ function Dashboard() {
       counts: cumulativeCounts,
     });
 
-    // ------- DUE TASKS CHART PROCESSING -------
-    // Get pending tasks
     const dueTasks = tasks.filter((task) => task.status !== "Completed");
 
-    // Group by due date
     const tasksByDueDate = dueTasks.reduce(
       (acc: Record<string, number>, task) => {
         if (!task.due_date) return acc;
 
         const date = new Date(task.due_date);
-        date.setHours(0, 0, 0, 0); // Normalize time to beginning of day
+        date.setHours(0, 0, 0, 0);
 
-        // Only include if it's within our date range (today or future)
         if (date >= today) {
           const formattedDate = formatDate(date);
           acc[formattedDate] = (acc[formattedDate] || 0) + 1;
@@ -144,7 +127,6 @@ function Dashboard() {
       {}
     );
 
-    // Get counts for each date in our range
     const dueCounts = formattedNext10Days.map((date) => {
       return tasksByDueDate[date] || 0;
     });
@@ -154,9 +136,7 @@ function Dashboard() {
       counts: dueCounts,
     });
 
-    // Process hours distribution for pie chart
     const processHoursDistribution = () => {
-      // Create buckets for different hour ranges
       const buckets = {
         "Small (0-4h)": { count: 0, color: "#8dd1e1" },
         "Medium (5-12h)": { count: 0, color: "#82ca9d" },
@@ -164,7 +144,6 @@ function Dashboard() {
         "XLarge (25-48h)": { count: 0, color: "#d0ed57" },
       };
 
-      // Categorize tasks based on estimated hours
       tasks.forEach((task) => {
         const hours = task.estimated_hours || 0;
 
@@ -179,7 +158,6 @@ function Dashboard() {
         }
       });
 
-      // Convert to format needed for pie chart
       const labels = Object.keys(buckets);
       const data = labels.map(
         (label) => buckets[label as keyof typeof buckets].count
@@ -188,7 +166,6 @@ function Dashboard() {
         (label) => buckets[label as keyof typeof buckets].color
       );
 
-      // Only include categories with non-zero counts
       const nonZeroIndexes = data
         .map((value, index) => (value > 0 ? index : -1))
         .filter((index) => index !== -1);
@@ -200,11 +177,9 @@ function Dashboard() {
       });
     };
 
-    // Call our new function
     processHoursDistribution();
   }, [tasks]);
 
-  // Count tasks by status
   const todoCount = tasks.filter((task) => task.status === "To Do").length;
   const inProgressCount = tasks.filter(
     (task) => task.status === "In Progress"

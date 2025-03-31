@@ -46,7 +46,7 @@ const getServiceInstance = (baseURL: string) => {
         setAuthToken(response.headers.authorization);
       }
 
-      return response.data;
+      return response;
     },
     (error) => {
       const errorMessage =

@@ -11,3 +11,13 @@ export interface Task {
   createdAt: string;
   estimated_hours: number;
 }
+
+export type SortDirection = "asc" | "desc";
+
+export type SortableColumn =
+  | "title"
+  | "assignee"
+  | "due_date"
+  | "status"
+  | "priority"
+  | "estimated_hours";

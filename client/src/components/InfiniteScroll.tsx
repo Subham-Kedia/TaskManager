@@ -3,7 +3,7 @@ import { Box, CircularProgress } from "@mui/material";
 
 interface InfiniteScrollProps {
   children: ReactNode;
-  onLoadMore: () => void;
+  onLoadMore: (cb: () => void) => void;
   hasMore: boolean;
   isLoading?: boolean;
   rootMargin?: string;
@@ -37,7 +37,9 @@ const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
 
         if (entry.isIntersecting && hasMore && !isLoading && !isFetching) {
           setIsFetching(true);
-          onLoadMore();
+          onLoadMore(() => {
+            setIsFetching(false);
+          });
         }
       },
       {
@@ -53,12 +55,6 @@ const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
       observer.disconnect();
     };
   }, [hasMore, isLoading, isFetching, onLoadMore, rootMargin]);
-
-  useEffect(() => {
-    if (!isLoading) {
-      setIsFetching(false);
-    }
-  }, [isLoading]);
 
   return (
     <Box
