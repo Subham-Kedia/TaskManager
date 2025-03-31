@@ -16,9 +16,7 @@ import { fetchTasks } from "@/store/slices/taskSlice";
 import { Task } from "@/types/task";
 import Filter from "@/components/Filter";
 import { FilterList } from "@mui/icons-material";
-
-const STATUS_OPTIONS = ["To Do", "In Progress", "Completed"];
-const PRIORITY_OPTIONS = ["high", "medium", "low"];
+import { STATUS_OPTIONS, PRIORITY_OPTIONS } from "@utils/table";
 
 function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();

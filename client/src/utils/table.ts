@@ -23,3 +23,6 @@ export const getStatusColor = (status: string) => {
       return "default";
   }
 };
+
+export const STATUS_OPTIONS = ["To Do", "In Progress", "Completed"];
+export const PRIORITY_OPTIONS = ["high", "medium", "low"];

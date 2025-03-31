@@ -33,9 +33,7 @@ import {
   TableContainer,
 } from "@/styles/table";
 import { SortDirection, SortableColumn, Task } from "@/types/task";
-
-const STATUS_OPTIONS = ["To Do", "In Progress", "Completed"];
-const PRIORITY_OPTIONS = ["high", "medium", "low"];
+import { STATUS_OPTIONS, PRIORITY_OPTIONS } from "@utils/table";
 
 const PAGE_SIZE = 15;
 
