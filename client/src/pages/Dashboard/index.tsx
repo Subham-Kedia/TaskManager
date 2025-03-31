@@ -1,14 +1,36 @@
 import { useEffect, useState } from "react";
-import { Typography, Container, Grid, Paper } from "@mui/material";
+import {
+  Typography,
+  Container,
+  Grid,
+  Paper,
+  SelectChangeEvent,
+  Box,
+  Button,
+} from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PieChart } from "@mui/x-charts/PieChart";
 import { fetchTasks } from "@/store/slices/taskSlice";
+import { Task } from "@/types/task";
+import Filter from "@/components/Filter";
+import { FilterList } from "@mui/icons-material";
+
+const STATUS_OPTIONS = ["To Do", "In Progress", "Completed"];
+const PRIORITY_OPTIONS = ["high", "medium", "low"];
 
 function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
   const { tasks } = useSelector((state: RootState) => state.tasks);
+  const [assigneeFilters, setAssigneeFilters] = useState<string[]>([]);
+  const [statusFilters, setStatusFilters] = useState<string[]>([]);
+  const [priorityFilters, setPriorityFilters] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
+
+  // Get unique assignees from tasks
+  const [assignees, setAssignees] = useState<string[]>([]);
+  const [processedTasks, setProcessedTasks] = useState<Task[]>([]);
   const [completionChartData, setCompletionChartData] = useState<{
     dates: string[];
     counts: number[];
@@ -41,7 +63,35 @@ function Dashboard() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (tasks.length === 0) return;
+    let result = [...tasks];
+
+    // Apply assignee filter
+    if (assigneeFilters.length > 0) {
+      result = result.filter((task) => assigneeFilters.includes(task.assignee));
+    }
+
+    // Apply status filter
+    if (statusFilters.length > 0) {
+      result = result.filter((task) => statusFilters.includes(task.status));
+    }
+
+    // Apply priority filter
+    if (priorityFilters.length > 0) {
+      result = result.filter((task) => priorityFilters.includes(task.priority));
+    }
+
+    setProcessedTasks(result);
+  }, [tasks, assigneeFilters, statusFilters, priorityFilters]);
+
+  useEffect(() => {
+    if (tasks.length > 0) {
+      const uniqueAssignees = [...new Set(tasks.map((task) => task.assignee))];
+      setAssignees(uniqueAssignees);
+    }
+  }, [tasks]);
+
+  useEffect(() => {
+    if (processedTasks.length === 0) return;
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -74,7 +124,9 @@ function Dashboard() {
     }
 
     const formattedNext10Days = next10Days.map(formatDate);
-    const completedTasks = tasks.filter((task) => task.status === "Completed");
+    const completedTasks = processedTasks.filter(
+      (task) => task.status === "Completed"
+    );
 
     const tasksByDate = completedTasks.reduce(
       (acc: Record<string, number>, task) => {
@@ -108,7 +160,9 @@ function Dashboard() {
       counts: cumulativeCounts,
     });
 
-    const dueTasks = tasks.filter((task) => task.status !== "Completed");
+    const dueTasks = processedTasks.filter(
+      (task) => task.status !== "Completed"
+    );
 
     const tasksByDueDate = dueTasks.reduce(
       (acc: Record<string, number>, task) => {
@@ -144,7 +198,7 @@ function Dashboard() {
         "XLarge (25-48h)": { count: 0, color: "#d0ed57" },
       };
 
-      tasks.forEach((task) => {
+      processedTasks.forEach((task) => {
         const hours = task.estimated_hours || 0;
 
         if (hours <= 4) {
@@ -178,21 +232,101 @@ function Dashboard() {
     };
 
     processHoursDistribution();
-  }, [tasks]);
+  }, [processedTasks]);
 
-  const todoCount = tasks.filter((task) => task.status === "To Do").length;
-  const inProgressCount = tasks.filter(
+  const handleAssigneeChange = (
+    event: SelectChangeEvent<typeof assigneeFilters>
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setAssigneeFilters(typeof value === "string" ? value.split(",") : value);
+  };
+
+  const handleStatusChange = (
+    event: SelectChangeEvent<typeof statusFilters>
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setStatusFilters(typeof value === "string" ? value.split(",") : value);
+  };
+
+  const handlePriorityChange = (
+    event: SelectChangeEvent<typeof priorityFilters>
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setPriorityFilters(typeof value === "string" ? value.split(",") : value);
+  };
+
+  const resetFilters = () => {
+    setAssigneeFilters([]);
+    setStatusFilters([]);
+    setPriorityFilters([]);
+  };
+
+  const hasActiveFilters =
+    assigneeFilters.length > 0 ||
+    statusFilters.length > 0 ||
+    priorityFilters.length > 0;
+
+  const todoCount = processedTasks.filter(
+    (task) => task.status === "To Do"
+  ).length;
+  const inProgressCount = processedTasks.filter(
     (task) => task.status === "In Progress"
   ).length;
-  const completedCount = tasks.filter(
+  const completedCount = processedTasks.filter(
     (task) => task.status === "Completed"
   ).length;
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" sx={{ mb: 3 }}>
-        Task Dashboard
-      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 3,
+        }}
+      >
+        <Typography variant="h4" sx={{ mb: 3 }}>
+          Task Dashboard
+        </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<FilterList />}
+          onClick={() => setShowFilters(!showFilters)}
+          color={hasActiveFilters ? "primary" : "inherit"}
+        >
+          {hasActiveFilters
+            ? `Filters (${
+                assigneeFilters.length +
+                statusFilters.length +
+                priorityFilters.length
+              })`
+            : "Filters"}
+        </Button>
+      </Box>
+
+      {showFilters && (
+        <Filter
+          assigneeFilters={assigneeFilters}
+          statusFilters={statusFilters}
+          priorityFilters={priorityFilters}
+          assignees={assignees}
+          statusOptions={STATUS_OPTIONS}
+          priorityOptions={PRIORITY_OPTIONS}
+          onAssigneeChange={handleAssigneeChange}
+          onStatusChange={handleStatusChange}
+          onPriorityChange={handlePriorityChange}
+          onResetFilters={resetFilters}
+          filteredCount={processedTasks.length}
+          totalCount={tasks.length}
+        />
+      )}
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper
