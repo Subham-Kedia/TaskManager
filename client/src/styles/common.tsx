@@ -10,5 +10,7 @@ export const ApplicationContainer = styled.div`
 export const PageContainer = styled.main`
   flex: 1;
   padding: 1.5rem 0;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 `;

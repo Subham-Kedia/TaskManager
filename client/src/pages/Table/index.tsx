@@ -1,14 +1,8 @@
 import { useEffect } from "react";
 import {
-  Container,
   Typography,
   Paper,
-  Table,
   TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Chip,
   IconButton,
   CircularProgress,
@@ -21,6 +15,13 @@ import { fetchTasks, searchTasks } from "@/store/slices/taskSlice";
 import { RootState, AppDispatch } from "@/store";
 import { getPriorityColor, getStatusColor } from "@utils/table";
 import SearchBox from "@/components/SearchBox";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableHeaderCell,
+} from "@/styles/table";
 
 function TaskTable() {
   const dispatch = useDispatch<AppDispatch>();
@@ -46,7 +47,7 @@ function TaskTable() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Box mx={4} flex={1} display="flex" flexDirection="column" overflow="auto">
       <Box
         sx={{
           display: "flex",
@@ -68,7 +69,6 @@ function TaskTable() {
           {error}
         </Alert>
       )}
-
       {searchQuery && (
         <Typography variant="body2" sx={{ mb: 2 }}>
           {filteredTasks.length === 0
@@ -78,21 +78,29 @@ function TaskTable() {
               } for "${searchQuery}"`}
         </Typography>
       )}
-
-      <TableContainer component={Paper}>
+      <Paper
+        sx={{
+          mb: 2,
+          flex: 1,
+          overflow: "auto",
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Title</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Assignee</TableCell>
-              <TableCell>Due Date</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Priority</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableHeaderCell>Title</TableHeaderCell>
+              <TableHeaderCell>Description</TableHeaderCell>
+              <TableHeaderCell>Assignee</TableHeaderCell>
+              <TableHeaderCell>Due Date</TableHeaderCell>
+              <TableHeaderCell>Status</TableHeaderCell>
+              <TableHeaderCell>Priority</TableHeaderCell>
+              <TableHeaderCell>Actions</TableHeaderCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+
+          <TableBody id="table-body" sx={{ flex: 1, overflow: "auto" }}>
             {loading ? (
               <TableRow>
                 <TableCell colSpan={7} align="center">
@@ -155,8 +163,8 @@ function TaskTable() {
             )}
           </TableBody>
         </Table>
-      </TableContainer>
-    </Container>
+      </Paper>
+    </Box>
   );
 }
 
