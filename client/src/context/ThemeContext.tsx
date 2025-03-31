@@ -6,6 +6,7 @@ import {
   PaletteMode,
 } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+import { ThemeProvider as SCThemeProvider } from "styled-components";
 
 // Define context type
 type ThemeContextType = {
@@ -149,10 +150,13 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <ThemeContext.Provider value={contextValue}>
-      <MUIThemeProvider theme={theme}>
+      <SCThemeProvider theme={theme}>
         <CssBaseline />
-        {children}
-      </MUIThemeProvider>
+        <MUIThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </MUIThemeProvider>
+      </SCThemeProvider>
     </ThemeContext.Provider>
   );
 };

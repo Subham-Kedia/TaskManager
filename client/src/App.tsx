@@ -1,21 +1,23 @@
 import { Routes, Route, Navigate } from "react-router";
-import { Box } from "@mui/material";
 import Dashboard from "@pages/Dashboard";
 import TaskTable from "@pages/Table";
-import Layout from "./components/Layout";
+
+import Layout from "@components/Layout";
+import { ApplicationContainer } from "@styles/common";
+import { PATHS } from "./config/path";
 
 function App() {
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    <ApplicationContainer>
       <Routes>
         <Route element={<Layout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/table" element={<TaskTable />} />
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<Navigate to={PATHS.DASHBOARD} replace />} />
+          <Route path={PATHS.DASHBOARD} element={<Dashboard />} />
+          <Route path={PATHS.TABLE} element={<TaskTable />} />
+          <Route path="*" element={<Navigate to={PATHS.DASHBOARD} replace />} />
         </Route>
       </Routes>
-    </Box>
+    </ApplicationContainer>
   );
 }
 

@@ -32,6 +32,9 @@
       "@pages/*": ["src/pages/*"],
       "@types/*": ["src/types/*"],
       "@context/*": ["src/context/*"],
+      "@store/*": ["src/store/*"],
+      "@styles/*": ["src/styles/*"],
+      "@services/*": ["src/services/*"],
     } 
   },
   "include": ["src"]

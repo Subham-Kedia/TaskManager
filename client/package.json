@@ -14,6 +14,8 @@
     "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^7.0.1",
     "@mui/material": "^7.0.1",
+    "@mui/styled-engine": "npm:@mui/styled-engine-sc@7.0.1",
+    "@mui/styled-engine-sc": "^7.0.1",
     "@mui/x-charts": "^7.28.0",
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",

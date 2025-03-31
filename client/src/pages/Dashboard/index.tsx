@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Typography, Container, Grid, Paper } from "@mui/material";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/store";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PieChart } from "@mui/x-charts/PieChart";
+import { fetchTasks } from "@/store/slices/taskSlice";
 
 function Dashboard() {
+  const dispatch = useDispatch<AppDispatch>();
   const { tasks } = useSelector((state: RootState) => state.tasks);
   const [completionChartData, setCompletionChartData] = useState<{
     dates: string[];
@@ -34,6 +36,10 @@ function Dashboard() {
     colors: [],
   });
 
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
+
   // Process tasks data for charts
   useEffect(() => {
     if (tasks.length === 0) return;
@@ -42,21 +48,38 @@ function Dashboard() {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to beginning of day
 
-    // Format a date as MM/DD
+    // Format a date as DD MMM (e.g., "15 Apr")
     const formatDate = (date: Date) => {
-      return `${date.getMonth() + 1}/${date.getDate()}`;
+      const day = date.getDate();
+      // Array of month abbreviations
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      const month = months[date.getMonth()];
+      return `${day} ${month}`;
     };
 
-    // Generate an array of the next 14 days (including today)
-    const next14Days: Date[] = [];
-    for (let i = 0; i < 14; i++) {
+    // Generate an array of the next 10 days (including today) instead of 14
+    const next10Days: Date[] = [];
+    for (let i = 0; i < 10; i++) {
       const date = new Date(today);
       date.setDate(today.getDate() + i);
-      next14Days.push(date);
+      next10Days.push(date);
     }
 
     // Format dates for display
-    const formattedNext14Days = next14Days.map(formatDate);
+    const formattedNext10Days = next10Days.map(formatDate);
 
     // ------- COMPLETION CHART PROCESSING -------
     // Get completed tasks
@@ -82,7 +105,7 @@ function Dashboard() {
     );
 
     // Initialize counts for all dates in our range
-    const completionCounts = formattedNext14Days.map((date) => {
+    const completionCounts = formattedNext10Days.map((date) => {
       return tasksByDate[date] || 0;
     });
 
@@ -94,7 +117,7 @@ function Dashboard() {
     });
 
     setCompletionChartData({
-      dates: formattedNext14Days,
+      dates: formattedNext10Days,
       counts: cumulativeCounts,
     });
 
@@ -122,12 +145,12 @@ function Dashboard() {
     );
 
     // Get counts for each date in our range
-    const dueCounts = formattedNext14Days.map((date) => {
+    const dueCounts = formattedNext10Days.map((date) => {
       return tasksByDueDate[date] || 0;
     });
 
     setDueChartData({
-      dates: formattedNext14Days,
+      dates: formattedNext10Days,
       counts: dueCounts,
     });
 
@@ -230,15 +253,15 @@ function Dashboard() {
                     label: "Tasks Completed",
                     min: 0,
                     max: Math.max(...completionChartData.counts) + 1,
-                    tickValues: Array.from(
-                      { length: Math.max(...dueChartData.counts, 1) + 2 },
-                      (_, i) => i
-                    ),
-                    steps: 1,
+                    // tickValues: Array.from(
+                    //   { length: Math.max(...dueChartData.counts, 1) + 2 },
+                    //   (_, i) => i
+                    // ),
+                    // steps: 1,
                   },
                 ]}
                 height={280}
-                margin={{ top: 20, bottom: 30, left: 40, right: 20 }}
+                margin={{ top: 20, bottom: 40, left: 40, right: 20 }}
                 slotProps={{
                   legend: {
                     position: { vertical: "top", horizontal: "right" },
@@ -300,7 +323,7 @@ function Dashboard() {
                   },
                 ]}
                 height={280}
-                margin={{ top: 20, bottom: 30, left: 40, right: 20 }}
+                margin={{ top: 20, bottom: 40, left: 40, right: 20 }}
                 slotProps={{
                   legend: {
                     position: { vertical: "top", horizontal: "right" },

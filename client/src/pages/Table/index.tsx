@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Container,
   Typography,
@@ -14,73 +14,35 @@ import {
   CircularProgress,
   Alert,
   Box,
-  InputBase,
-  alpha,
 } from "@mui/material";
-import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Search as SearchIcon,
-  Close as CloseIcon,
-} from "@mui/icons-material";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTasks, searchTasks } from "@/store/slices/taskSlice";
 import { RootState, AppDispatch } from "@/store";
-import { useTheme } from "@/context/ThemeContext";
+import { getPriorityColor, getStatusColor } from "@utils/table";
+import SearchBox from "@/components/SearchBox";
 
 function TaskTable() {
   const dispatch = useDispatch<AppDispatch>();
-  const { mode } = useTheme();
+
   const { filteredTasks, loading, error, searchQuery } = useSelector(
     (state: RootState) => state.tasks
   );
-  const [localSearchQuery, setLocalSearchQuery] = useState("");
 
   useEffect(() => {
     dispatch(fetchTasks());
   }, [dispatch]);
 
-  useEffect(() => {
-    // Keep local search state in sync with Redux state
-    setLocalSearchQuery(searchQuery);
-  }, [searchQuery]);
+  // useEffect(() => {
+  //   setLocalSearchQuery(searchQuery);
+  // }, [searchQuery]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(searchTasks(localSearchQuery));
+  const handleSearch = (q: string) => {
+    dispatch(searchTasks(q));
   };
 
   const clearSearch = () => {
-    setLocalSearchQuery("");
     dispatch(searchTasks(""));
-  };
-
-  // Function to get appropriate color for priority
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "error";
-      case "medium":
-        return "warning";
-      case "low":
-        return "success";
-      default:
-        return "default";
-    }
-  };
-
-  // Function to get appropriate color for status
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "Completed":
-        return "success";
-      case "In Progress":
-        return "primary";
-      case "To Do":
-        return "default";
-      default:
-        return "default";
-    }
   };
 
   return (
@@ -94,47 +56,11 @@ function TaskTable() {
         }}
       >
         <Typography variant="h4">Task List</Typography>
-
-        <Paper
-          component="form"
-          onSubmit={handleSearch}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            borderRadius: 2,
-            backgroundColor: alpha(
-              mode === "light" ? "#f5f5f5" : "#2a2a2a",
-              0.7
-            ),
-            "&:hover": {
-              backgroundColor: alpha(
-                mode === "light" ? "#e0e0e0" : "#333333",
-                0.9
-              ),
-            },
-            pl: 2,
-            width: { xs: "100%", sm: "300px" },
-            maxWidth: "500px",
-          }}
-        >
-          <SearchIcon sx={{ color: "text.secondary", mr: 1 }} />
-          <InputBase
-            placeholder="Search tasks..."
-            sx={{
-              flex: 1,
-              "& .MuiInputBase-input": {
-                py: 1,
-              },
-            }}
-            value={localSearchQuery}
-            onChange={(e) => setLocalSearchQuery(e.target.value)}
-          />
-          {localSearchQuery && (
-            <IconButton size="small" onClick={clearSearch} sx={{ p: "5px" }}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          )}
-        </Paper>
+        <SearchBox
+          searchQuery={searchQuery}
+          handleSearch={handleSearch}
+          clearSearch={clearSearch}
+        />
       </Box>
 
       {error && (

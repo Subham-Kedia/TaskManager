@@ -33,6 +33,7 @@ export default defineConfig({
       "@services": "/src/services",
       "@types": "/src/types",
       "@context": "/src/context",
+      "@styles": "/src/styles",
     },
   },
 });

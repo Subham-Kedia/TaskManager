@@ -1,80 +1,69 @@
-import {
-  AppBar,
-  Box,
-  Toolbar,
-  Typography,
-  Button,
-  IconButton,
-  Tooltip,
-} from "@mui/material";
+import { AppBar, Box, Toolbar, Typography, Button } from "@mui/material";
 import { Link, Outlet, useLocation } from "react-router";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "@context/ThemeContext";
+import { PageContainer } from "@styles/common";
+import IconButtonWithTooltip from "./IconButtonWithTooltip";
+import { PATHS } from "@config/path";
 
 function Layout() {
   const location = useLocation();
   const { mode, toggleColorMode } = useTheme();
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <>
       <AppBar position="sticky">
         <Toolbar>
           <Typography
             variant="h6"
             component="div"
             sx={{
-              flexGrow: 1,
               mr: { xs: 2, md: 0 },
             }}
           >
             Task Manager
           </Typography>
-
           <Box sx={{ display: "flex", ml: "auto" }}>
             <Button
               component={Link}
-              to="/dashboard"
+              to={PATHS.DASHBOARD}
               color="inherit"
               sx={{
                 mx: 1,
                 fontWeight:
-                  location.pathname === "/dashboard" ? "bold" : "normal",
+                  location.pathname === PATHS.DASHBOARD ? "bold" : "normal",
               }}
             >
               Dashboard
             </Button>
             <Button
               component={Link}
-              to="/table"
+              to={PATHS.TABLE}
               color="inherit"
               sx={{
                 mx: 1,
-                fontWeight: location.pathname === "/table" ? "bold" : "normal",
+                fontWeight:
+                  location.pathname === PATHS.TABLE ? "bold" : "normal",
               }}
             >
               Tasks
             </Button>
-            <Tooltip
+            <IconButtonWithTooltip
               title={
                 mode === "dark" ? "Switch to light mode" : "Switch to dark mode"
               }
+              handleClick={toggleColorMode}
             >
-              <IconButton
-                color="inherit"
-                onClick={toggleColorMode}
-                sx={{ ml: 1 }}
-              >
-                {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
-              </IconButton>
-            </Tooltip>
+              {mode === "dark" ? <Brightness7Icon /> : <Brightness4Icon />}
+            </IconButtonWithTooltip>
           </Box>
         </Toolbar>
       </AppBar>
-      <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
+      <PageContainer>
         <Outlet />
-      </Box>
-    </Box>
+      </PageContainer>
+    </>
   );
 }
 
