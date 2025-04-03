@@ -1,5 +1,5 @@
+import { FilterList } from "@mui/icons-material";
 import {
-  Paper,
   Stack,
   FormControl,
   InputLabel,
@@ -9,12 +9,13 @@ import {
   Checkbox,
   ListItemText,
   Button,
-  Typography,
   SelectChangeEvent,
   Box,
+  Popover,
 } from "@mui/material";
+import { useState } from "react";
+import { PRIORITY_OPTIONS, STATUS_OPTIONS } from "@/utils/table";
 
-// Dropdown select styles
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -26,7 +27,6 @@ const MenuProps = {
   },
 };
 
-// Filter configuration interface
 export interface FilterConfig {
   id: string;
   label: string;
@@ -36,184 +36,152 @@ export interface FilterConfig {
 }
 
 interface FilterProps {
-  // Can be used with direct props
   assigneeFilters?: string[];
   statusFilters?: string[];
   priorityFilters?: string[];
-
   assignees?: string[];
-  statusOptions?: string[];
-  priorityOptions?: string[];
-
   onAssigneeChange?: (event: SelectChangeEvent<string[]>) => void;
   onStatusChange?: (event: SelectChangeEvent<string[]>) => void;
   onPriorityChange?: (event: SelectChangeEvent<string[]>) => void;
-
-  // Or with custom filter configs
-  filters?: FilterConfig[];
-
-  // Common props
   onResetFilters: () => void;
-  filteredCount?: number;
-  totalCount?: number;
-  variant?: "paper" | "outlined" | "plain";
-  orientation?: "horizontal" | "vertical";
 }
 
 const Filter: React.FC<FilterProps> = ({
-  // Traditional direct props
   assigneeFilters = [],
   statusFilters = [],
   priorityFilters = [],
   assignees = [],
-  statusOptions = [],
-  priorityOptions = [],
   onAssigneeChange,
   onStatusChange,
   onPriorityChange,
-
-  // Config-based props
-  filters = [],
-
-  // Common props
   onResetFilters,
-  filteredCount,
-  totalCount,
-  variant = "paper",
-  orientation = "horizontal",
 }) => {
-  // Check if any filters are active
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const hasActiveFilters =
     assigneeFilters.length > 0 ||
     statusFilters.length > 0 ||
-    priorityFilters.length > 0 ||
-    filters.some((filter) => filter.values.length > 0);
+    priorityFilters.length > 0;
 
-  // Convert traditional props to filter configs if needed
-  const resolvedFilters: FilterConfig[] =
-    filters.length > 0
-      ? filters
-      : [
-          ...(onAssigneeChange
-            ? [
-                {
-                  id: "assignee",
-                  label: "Assignee",
-                  options: assignees,
-                  values: assigneeFilters,
-                  onChange: onAssigneeChange,
-                },
-              ]
-            : []),
-          ...(onStatusChange
-            ? [
-                {
-                  id: "status",
-                  label: "Status",
-                  options: statusOptions,
-                  values: statusFilters,
-                  onChange: onStatusChange,
-                },
-              ]
-            : []),
-          ...(onPriorityChange
-            ? [
-                {
-                  id: "priority",
-                  label: "Priority",
-                  options: priorityOptions,
-                  values: priorityFilters,
-                  onChange: onPriorityChange,
-                },
-              ]
-            : []),
-        ];
-
-  // Get the wrapper component based on variant
-  const WrapperComponent = variant === "paper" ? Paper : Box;
-  const wrapperProps =
-    variant === "paper"
-      ? { sx: { p: 2, mb: 2 } }
-      : variant === "outlined"
-      ? {
-          sx: {
-            p: 2,
-            mb: 2,
-            border: 1,
-            borderColor: "divider",
-            borderRadius: 1,
+  const resolvedFilters: FilterConfig[] = [
+    ...(onAssigneeChange
+      ? [
+          {
+            id: "assignee",
+            label: "Assignee",
+            options: assignees,
+            values: assigneeFilters,
+            onChange: onAssigneeChange,
           },
-        }
-      : { sx: { mb: 2 } };
+        ]
+      : []),
+    ...(onStatusChange
+      ? [
+          {
+            id: "status",
+            label: "Status",
+            options: STATUS_OPTIONS,
+            values: statusFilters,
+            onChange: onStatusChange,
+          },
+        ]
+      : []),
+    ...(onPriorityChange
+      ? [
+          {
+            id: "priority",
+            label: "Priority",
+            options: PRIORITY_OPTIONS,
+            values: priorityFilters,
+            onChange: onPriorityChange,
+          },
+        ]
+      : []),
+  ];
 
+  const handleButtonClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const open = Boolean(anchorEl);
+  const id = open ? "filter-popover" : undefined;
   return (
-    <WrapperComponent {...wrapperProps}>
-      <Stack
-        direction={
-          orientation === "horizontal" ? { xs: "column", sm: "row" } : "column"
-        }
-        spacing={2}
-        sx={{ mb: 2 }}
-        alignItems={
-          orientation === "horizontal"
-            ? { xs: "stretch", sm: "center" }
-            : "stretch"
-        }
+    <>
+      <Button
+        variant="outlined"
+        startIcon={<FilterList />}
+        onClick={handleButtonClick}
+        color={hasActiveFilters ? "primary" : "inherit"}
       >
-        {resolvedFilters.map((filter) => (
-          <FormControl
-            key={filter.id}
-            sx={{ minWidth: 200, flex: 1 }}
-            size="small"
-          >
-            <InputLabel id={`${filter.id}-filter-label`}>
-              {filter.label}
-            </InputLabel>
-            <Select
-              labelId={`${filter.id}-filter-label`}
-              id={`${filter.id}-filter`}
-              multiple
-              value={filter.values}
-              onChange={filter.onChange}
-              input={<OutlinedInput label={filter.label} />}
-              renderValue={(selected) => selected.join(", ")}
-              MenuProps={MenuProps}
+        {hasActiveFilters
+          ? `Filters (${
+              assigneeFilters.length +
+              statusFilters.length +
+              priorityFilters.length
+            })`
+          : "Filters"}
+      </Button>
+
+      <Popover
+        id={id}
+        open={open}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+      >
+        <Box p={2}>
+          <Stack direction="column" spacing={2} alignItems="stretch">
+            {resolvedFilters.map((filter) => (
+              <FormControl
+                key={filter.id}
+                sx={{ width: 250, flex: 1 }}
+                size="small"
+              >
+                <InputLabel id={`${filter.id}-filter-label`}>
+                  {filter.label}
+                </InputLabel>
+                <Select
+                  labelId={`${filter.id}-filter-label`}
+                  id={`${filter.id}-filter`}
+                  multiple
+                  value={filter.values}
+                  onChange={filter.onChange}
+                  input={<OutlinedInput label={filter.label} />}
+                  renderValue={(selected) => selected.join(", ")}
+                  MenuProps={MenuProps}
+                  fullWidth
+                >
+                  {filter.options.map((option) => (
+                    <MenuItem key={option} value={option} dense>
+                      <Checkbox checked={filter.values.indexOf(option) > -1} />
+                      <ListItemText primary={option} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ))}
+
+            <Button
+              variant="outlined"
+              onClick={onResetFilters}
+              size="small"
+              disabled={!hasActiveFilters}
+              sx={{
+                mt: { xs: 1, sm: 0 },
+                alignSelf: { xs: "flex-start", sm: "center" },
+              }}
             >
-              {filter.options.map((option) => (
-                <MenuItem key={option} value={option}>
-                  <Checkbox checked={filter.values.indexOf(option) > -1} />
-                  <ListItemText primary={option} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        ))}
-
-        <Button
-          variant="outlined"
-          onClick={onResetFilters}
-          size="small"
-          disabled={!hasActiveFilters}
-          sx={{
-            mt: orientation === "horizontal" ? { xs: 1, sm: 0 } : 1,
-            alignSelf:
-              orientation === "horizontal"
-                ? { xs: "flex-start", sm: "center" }
-                : "flex-start",
-          }}
-        >
-          Reset
-        </Button>
-      </Stack>
-
-      {filteredCount !== undefined &&
-        totalCount !== undefined &&
-        filteredCount !== totalCount && (
-          <Typography variant="body2" color="text.secondary">
-            Found {filteredCount} of {totalCount} items after filtering
-          </Typography>
-        )}
-    </WrapperComponent>
+              Reset
+            </Button>
+          </Stack>
+        </Box>
+      </Popover>
+    </>
   );
 };
 

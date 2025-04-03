@@ -6,7 +6,6 @@ import {
   Paper,
   SelectChangeEvent,
   Box,
-  Button,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
@@ -15,8 +14,6 @@ import { PieChart } from "@mui/x-charts/PieChart";
 import { fetchTasks } from "@/store/slices/taskSlice";
 import { Task } from "@/types/task";
 import Filter from "@/components/Filter";
-import { FilterList } from "@mui/icons-material";
-import { STATUS_OPTIONS, PRIORITY_OPTIONS } from "@utils/table";
 
 function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,7 +21,6 @@ function Dashboard() {
   const [assigneeFilters, setAssigneeFilters] = useState<string[]>([]);
   const [statusFilters, setStatusFilters] = useState<string[]>([]);
   const [priorityFilters, setPriorityFilters] = useState<string[]>([]);
-  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   // Get unique assignees from tasks
   const [assignees, setAssignees] = useState<string[]>([]);
@@ -265,11 +261,6 @@ function Dashboard() {
     setPriorityFilters([]);
   };
 
-  const hasActiveFilters =
-    assigneeFilters.length > 0 ||
-    statusFilters.length > 0 ||
-    priorityFilters.length > 0;
-
   const todoCount = processedTasks.filter(
     (task) => task.status === "To Do"
   ).length;
@@ -290,41 +281,18 @@ function Dashboard() {
           mb: 3,
         }}
       >
-        <Typography variant="h4" sx={{ mb: 3 }}>
-          Task Dashboard
-        </Typography>
-        <Button
-          variant="outlined"
-          startIcon={<FilterList />}
-          onClick={() => setShowFilters(!showFilters)}
-          color={hasActiveFilters ? "primary" : "inherit"}
-        >
-          {hasActiveFilters
-            ? `Filters (${
-                assigneeFilters.length +
-                statusFilters.length +
-                priorityFilters.length
-              })`
-            : "Filters"}
-        </Button>
-      </Box>
-
-      {showFilters && (
+        <Typography variant="h4">Task Dashboard</Typography>
         <Filter
           assigneeFilters={assigneeFilters}
           statusFilters={statusFilters}
           priorityFilters={priorityFilters}
           assignees={assignees}
-          statusOptions={STATUS_OPTIONS}
-          priorityOptions={PRIORITY_OPTIONS}
           onAssigneeChange={handleAssigneeChange}
           onStatusChange={handleStatusChange}
           onPriorityChange={handlePriorityChange}
           onResetFilters={resetFilters}
-          filteredCount={processedTasks.length}
-          totalCount={tasks.length}
         />
-      )}
+      </Box>
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper
