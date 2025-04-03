@@ -32,6 +32,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({
     <Paper
       component="form"
       onSubmit={onSubmit}
+      elevation={2}
       sx={{
         display: "flex",
         alignItems: "center",

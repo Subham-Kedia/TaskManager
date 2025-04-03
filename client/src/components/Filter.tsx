@@ -172,9 +172,9 @@ const Filter: React.FC<FilterProps> = ({
               size="small"
               disabled={!hasActiveFilters}
               sx={{
-                mt: { xs: 1, sm: 0 },
-                alignSelf: { xs: "flex-start", sm: "center" },
+                mt: 1,
               }}
+              fullWidth
             >
               Reset
             </Button>

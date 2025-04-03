@@ -122,7 +122,7 @@ const FilterAndReOrder: React.FC<FilterAndReOrderProps> = ({
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            p: 2,
+            p: 1,
             borderBottom: 1,
             borderColor: "divider",
           }}
@@ -162,6 +162,7 @@ const FilterAndReOrder: React.FC<FilterAndReOrderProps> = ({
                     />
                   }
                   label={item.label}
+                  sx={{ fontSize: "typography.body2.fontSize" }}
                 />
               ))}
             </FormGroup>

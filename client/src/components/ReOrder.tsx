@@ -1,7 +1,8 @@
-import { Box, Typography } from "@mui/material";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { FilterItem } from "./FilterAndReOrder";
+import { Box, Typography } from "@mui/material";
 import { useState } from "react";
+
+import { FilterItem } from "./FilterAndReOrder";
 
 interface ReOrderProps {
   items: FilterItem[];

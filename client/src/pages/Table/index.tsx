@@ -209,34 +209,24 @@ function TaskTable() {
 
   return (
     <Box mx={2} flex={1} display="flex" flexDirection="column" overflow="auto">
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          mb: 3,
-        }}
-      >
-        <Typography variant="h4">Task List</Typography>
-        <Stack direction="row" spacing={2}>
-          <FilterAndReOrder columns={columns} onChange={handleColumnChange} />
-          <Filter
-            assigneeFilters={assigneeFilters}
-            statusFilters={statusFilters}
-            priorityFilters={priorityFilters}
-            assignees={assignees}
-            onAssigneeChange={handleAssigneeChange}
-            onStatusChange={handleStatusChange}
-            onPriorityChange={handlePriorityChange}
-            onResetFilters={resetFilters}
-          />
-          <SearchBox
-            searchQuery={searchQuery}
-            handleSearch={handleSearch}
-            clearSearch={clearSearch}
-          />
-        </Stack>
-      </Box>
+      <Stack direction="row" flexWrap="wrap-reverse" gap={2} mb={2}>
+        <FilterAndReOrder columns={columns} onChange={handleColumnChange} />
+        <Filter
+          assigneeFilters={assigneeFilters}
+          statusFilters={statusFilters}
+          priorityFilters={priorityFilters}
+          assignees={assignees}
+          onAssigneeChange={handleAssigneeChange}
+          onStatusChange={handleStatusChange}
+          onPriorityChange={handlePriorityChange}
+          onResetFilters={resetFilters}
+        />
+        <SearchBox
+          searchQuery={searchQuery}
+          handleSearch={handleSearch}
+          clearSearch={clearSearch}
+        />
+      </Stack>
 
       {error && (
         <Alert severity="error" sx={{ mb: 2 }}>

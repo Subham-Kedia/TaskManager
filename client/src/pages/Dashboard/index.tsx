@@ -1,19 +1,12 @@
 import { useEffect, useState } from "react";
-import {
-  Typography,
-  Container,
-  Grid,
-  Paper,
-  SelectChangeEvent,
-  Box,
-} from "@mui/material";
+import { Typography, Grid, Paper, SelectChangeEvent, Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { PieChart } from "@mui/x-charts/PieChart";
-import { fetchTasks } from "@/store/slices/taskSlice";
+import { fetchTasks } from "@store/slices/taskSlice";
 import { Task } from "@/types/task";
-import Filter from "@/components/Filter";
+import Filter from "@components/Filter";
 
 function Dashboard() {
   const dispatch = useDispatch<AppDispatch>();
@@ -272,13 +265,14 @@ function Dashboard() {
   ).length;
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <>
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           mb: 3,
+          p: 2,
         }}
       >
         <Typography variant="h4">Task Dashboard</Typography>
@@ -293,7 +287,7 @@ function Dashboard() {
           onResetFilters={resetFilters}
         />
       </Box>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} p={2}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Paper
             sx={{
@@ -303,7 +297,7 @@ function Dashboard() {
               height: 350,
             }}
           >
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="subtitle2" gutterBottom>
               Tasks Completed Over Time
             </Typography>
             {completionChartData.dates.length > 0 ? (
@@ -328,11 +322,6 @@ function Dashboard() {
                     label: "Tasks Completed",
                     min: 0,
                     max: Math.max(...completionChartData.counts) + 1,
-                    // tickValues: Array.from(
-                    //   { length: Math.max(...dueChartData.counts, 1) + 2 },
-                    //   (_, i) => i
-                    // ),
-                    // steps: 1,
                   },
                 ]}
                 height={280}
@@ -345,6 +334,7 @@ function Dashboard() {
               />
             ) : (
               <Typography
+                variant="body2"
                 sx={{
                   flexGrow: 1,
                   display: "flex",
@@ -367,7 +357,7 @@ function Dashboard() {
               height: 350,
             }}
           >
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="subtitle2" gutterBottom>
               Tasks Due By Day
             </Typography>
             {dueChartData.dates.length > 0 ? (
@@ -421,16 +411,16 @@ function Dashboard() {
         </Grid>
 
         {/* New Pie Chart for Task Hours Distribution */}
-        <Grid size={{ xs: 12, md: 12 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Paper
             sx={{
-              p: 3,
+              p: 2,
               display: "flex",
               flexDirection: "column",
               height: 350,
             }}
           >
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="subtitle2" gutterBottom>
               Task Effort Distribution
             </Typography>
             {hoursDistribution.data.length > 0 ? (
@@ -449,16 +439,15 @@ function Dashboard() {
                     cornerRadius: 5,
                     startAngle: -90,
                     endAngle: 270,
-                    cx: 150,
-                    cy: 150,
+                    cx: 60,
+                    cy: 100,
                   },
                 ]}
-                height={280}
                 margin={{ top: 10, bottom: 10, left: 50, right: 50 }}
                 slotProps={{
                   legend: {
-                    direction: "column",
-                    position: { vertical: "middle", horizontal: "right" },
+                    direction: "row",
+                    position: { vertical: "bottom", horizontal: "right" },
                     labelStyle: {
                       fontSize: 14,
                     },
@@ -564,7 +553,7 @@ function Dashboard() {
           </Paper>
         </Grid>
       </Grid>
-    </Container>
+    </>
   );
 }
 

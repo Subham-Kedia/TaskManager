@@ -1,7 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { Provider as ReduxProvider } from "react-redux";
-import { store } from "./store";
-import App from "./App.tsx";
+import { store } from "@store/index";
+import App from "@/App";
 import { BrowserRouter } from "react-router";
 import { SnackbarProvider } from "notistack";
 import { ThemeProvider } from "@context/ThemeContext.tsx";
